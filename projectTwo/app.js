@@ -1,3 +1,4 @@
+
 const ExcelJS = require('exceljs');
 const fs = require('fs');
 
@@ -6,22 +7,21 @@ async function generateExcelTable() {
   const worksheet = workbook.addWorksheet('Table 1');
 
   const logoImage = workbook.addImage({
-    filename: 'logo.png', // Replace with the path to your logo image file
+    filename: 'logo.png', 
     extension: 'png',
   });
 
   worksheet.addImage(logoImage, {
-    tl: { col: 0, row: 0 }, // Top-left cell coordinates (1-based index)
-    br: { col: 2, row: 4 }, // Bottom-right cell coordinates (1-based index)
+    tl: { col: 0, row: 0 }, 
+    br: { col: 2, row: 4 }, 
   });
 
-    // Set row heights
     worksheet.getRow(5).height = 15;
     worksheet.getRow(12).height = 49.5;
     worksheet.getRow(15).height = 15;
     worksheet.getRow(16).height = 70.5;
   
-    // Set column widths
+
     worksheet.getColumn('A').width = 5.89;
     worksheet.getColumn('B').width = 18.33;
     worksheet.getColumn('C').width = 21.11;
@@ -37,7 +37,7 @@ async function generateExcelTable() {
     worksheet.getColumn('M').width = 8.11;
     worksheet.getColumn('N').width = 8.11;
 
-  // Merge cells
+
     worksheet.mergeCells('A6:I11');
     worksheet.mergeCells('A12:B12');
     worksheet.mergeCells('H12:I12');
@@ -56,7 +56,6 @@ async function generateExcelTable() {
     worksheet.mergeCells('A25:C25');
 
 
-  // Set the value for the merged cells
     worksheet.getCell('A5').value = 'Predmet: ';
     worksheet.getCell('A6').alignment = { vertical: 'middle', wrapText: true };
     worksheet.getCell('A6').value = 'NALOG ZA ISPLATU\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
@@ -67,7 +66,6 @@ async function generateExcelTable() {
     worksheet.getCell('A34').alignment = { vertical: 'middle', wrapText: true };
     worksheet.getCell('J34').alignment = { vertical: 'middle', wrapText: true };
 
-  // Apply rich text formatting to a cell
 function applyRichTextFormatting(worksheet, cellRef, boldText) {
     const cell = worksheet.getCell(cellRef);
     
@@ -81,17 +79,17 @@ function applyRichTextFormatting(worksheet, cellRef, boldText) {
   
   applyRichTextFormatting(worksheet, 'A6', 'NALOG ZA ISPLATU');
   
-//   // Read JSON file
+
 //   const jsonData = fs.readFileSync('data.json', 'utf8');
 //   const data = JSON.parse(jsonData);
 
-//   // Add rows from JSON data
+
 //   data.forEach((row, index) => {
 //     const rowIndex = index + 12; // Add 12 to account for the preceding rows
 //     worksheet.addRow(row).commit();
 //   });
 
-  // Apply styling to rows
+
   const greyFill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'DDDDDD' } };
   const boldFont = { bold: true };
   const boldBorder = { style: 'medium' };
