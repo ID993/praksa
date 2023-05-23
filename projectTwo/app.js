@@ -75,6 +75,14 @@ function applyRowColorToCells(worksheet, rowIndex, startColumn, endColumn) {
   }
 }
 
+function setNumFormat(worksheet, startRow, endRow, startCol, endCol, format) {
+  for (let i = startRow; i <= endRow; i++) {
+    for (let j = startCol; j <= endCol; j++) {
+      worksheet.getCell(`${String.fromCharCode(64 + j)}${i}`).numFmt = format;
+    }
+  }
+}
+
 async function generateExcelTable() {
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet('Table 1');
@@ -93,6 +101,7 @@ async function generateExcelTable() {
     worksheet.getRow(12).height = 49.5;
     worksheet.getRow(15).height = 15;
     worksheet.getRow(16).height = 70.5;
+    
   
     worksheet.getColumn('A').width = 5.89;
     worksheet.getColumn('B').width = 18.33;
@@ -111,7 +120,9 @@ async function generateExcelTable() {
 
     worksheet.mergeCells('A6:I11');
     worksheet.mergeCells('A12:B12');
+    worksheet.mergeCells('A13:B13');
     worksheet.mergeCells('H12:I12');
+    worksheet.mergeCells('H13:I13');
     worksheet.mergeCells('J34:L35');
     worksheet.mergeCells('A28:C29');
     worksheet.mergeCells('A34:C35');
@@ -124,6 +135,7 @@ async function generateExcelTable() {
     worksheet.mergeCells('J15:J16');
     worksheet.mergeCells('E15:G15');
     worksheet.mergeCells('K15:M15');
+    worksheet.mergeCells('N15:N16');
     worksheet.mergeCells('A25:C25');
 
     worksheet.getCell('A5').value = 'Predmet: ';
@@ -174,19 +186,80 @@ async function generateExcelTable() {
     worksheet.getCell('N15').value = 'Ukupno za isplatu (EUR)';
     worksheet.getCell('A25').value = 'UKUPNO';
 
-    //   const jsonData = fs.readFileSync('data.json', 'utf8');
-    //   const data = JSON.parse(jsonData);
+    worksheet.getRow(13).eachCell({ includeEmpty: true }, (cell) => {
+      cell.font = {
+        name: 'Calibri',
+        bold: false,
+        size: 11 };
+      });
 
+    const data = await readSecondTable();
+      
+    data.forEach((row, index) => {
+      worksheet.getCell('A5').value = 'Predmet: ' + row['PredmetNaziv'];
+      worksheet.getCell('A13').value = row['Katedra'];
+      worksheet.getCell('C13').value = row['Studij'];
+      worksheet.getCell('D13').value = row['SkolskaGodinaNaziv'];
+      worksheet.getCell(`A${index + 17}`).value = index + 1;
+      worksheet.getCell(`B${index + 17}`).value = row['NastavnikSuradnikNaziv'];
+      worksheet.getCell(`C${index + 17}`).value = row['ZvanjeNaziv'];
+      worksheet.getCell(`D${index + 17}`).value = row['NazivNastavnikStatus'];
+      worksheet.getCell(`E${index + 17}`).value = row['PlaniraniSatiPredavanja'];
+      worksheet.getCell(`F${index + 17}`).value = row['PlaniraniSatiSeminari'];
+      worksheet.getCell(`G${index + 17}`).value = row['PlaniraniSatiVjezbe'];
+      worksheet.getCell(`H${index + 17}`).value = row['NormaPlaniraniSatiPredavanja'];
+      worksheet.getCell(`I${index + 17}`).value = row['NormaPlaniraniSatiSeminari'];
+      worksheet.getCell(`J${index + 17}`).value = row['NormaPlaniraniSatiVjezbe'];
+      worksheet.getCell(`K${index + 17}`).value = row['RealiziraniSatiPredavanja'];
+      worksheet.getCell(`L${index + 17}`).value = row['RealiziraniSatiSeminari'];
+      worksheet.getCell(`M${index + 17}`).value = row['RealiziraniSatiVjezbe'];
+      worksheet.getCell(`N${index + 17}`).value = row['RealiziraniSatiPredavanja'] + row['RealiziraniSatiSeminari'] + row['RealiziraniSatiVjezbe'];
+      worksheet.getCell('E25').value = { formula: 'SUM(E17:E24)'};
+      worksheet.getCell('F25').value = { formula: 'SUM(F17:F24)'};
+      worksheet.getCell('G25').value = { formula: 'SUM(G17:G24)'};
+      worksheet.getCell('K25').value = { formula: 'SUM(E17:E24)'};
+      worksheet.getCell('L25').value = { formula: 'SUM(F17:F24)'};
+      worksheet.getCell('M25').value = { formula: 'SUM(G17:G24)'};
+      worksheet.getCell('N25').value = { formula: 'SUM(E17:E24)'};
 
-    //   data.forEach((row, index) => {
-    //     const rowIndex = index + 12; // Add 12 to account for the preceding rows
-    //     worksheet.addRow(row).commit();
-    //   });
+      setNumFormat(worksheet, 25, 25, 5, 7, '0.00');
+      setNumFormat(worksheet, 17, 25, 11, 14, '0.00');
+
+    });
 
     await workbook.xlsx.writeFile('projectTwo.xlsx');
       console.log('Excel file generated!');
 }
 
+async function readSecondTable() {
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.readFile('./data.xlsx');
+  const worksheet = workbook.getWorksheet('List1');
+
+  const data = [];
+
+  worksheet.eachRow((row, rowIndex) => {
+    if (rowIndex > 1) {
+      const rowData = {};
+
+      row.eachCell((cell, cellIndex) => {
+        const headerCell = worksheet.getRow(1).getCell(cellIndex);
+        const header = headerCell.value;
+
+        rowData[header] = cell.value;
+      });
+
+      data.push(rowData);
+    }
+  });
+
+  return data;
+}
+
+
 generateExcelTable().catch((error) => {
+  console.log('An error occurred:', error);
+});
+readSecondTable().catch((error) => {
   console.log('An error occurred:', error);
 });
