@@ -123,9 +123,6 @@ async function generateExcelTable() {
     worksheet.mergeCells('A13:B13');
     worksheet.mergeCells('H12:I12');
     worksheet.mergeCells('H13:I13');
-    worksheet.mergeCells('J34:L35');
-    worksheet.mergeCells('A28:C29');
-    worksheet.mergeCells('A34:C35');
     worksheet.mergeCells('A15:A16');
     worksheet.mergeCells('B15:B16');
     worksheet.mergeCells('C15:C16');
@@ -136,17 +133,12 @@ async function generateExcelTable() {
     worksheet.mergeCells('E15:G15');
     worksheet.mergeCells('K15:M15');
     worksheet.mergeCells('N15:N16');
-    worksheet.mergeCells('A25:C25');
+    
 
     worksheet.getCell('A5').value = 'Predmet: ';
     worksheet.getCell('A6').alignment = { vertical: 'middle', wrapText: true };
     worksheet.getCell('A6').value = 'NALOG ZA ISPLATU\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
-    worksheet.getCell('A28').value = 'Prodekanica za nastavu i studentska pitanja\nProf. dr. sc.: Ime Prezime';
-    worksheet.getCell('A34').value = 'Prodekan za financije i upravljanje\nProf. dr. sc. Ime Prezime';
-    worksheet.getCell('J34').value = 'Dekan\nProf. dr. sc. Ime Prezime';
-    worksheet.getCell('A28').alignment = { vertical: 'middle', wrapText: true };
-    worksheet.getCell('A34').alignment = { vertical: 'middle', wrapText: true };
-    worksheet.getCell('J34').alignment = { vertical: 'middle', wrapText: true };
+    
 
     applyRichTextFormatting(worksheet, 'A6', 'NALOG ZA ISPLATU');
   
@@ -155,11 +147,10 @@ async function generateExcelTable() {
     applyOneRowBorderToCells(worksheet, 13, 1, 9, 'thin');
     applyRowBorderToCells(worksheet, 15, 1, 14, 'medium');
     applyRowBorderToCells(worksheet, 16, 1, 14, 'medium');
-    applyBorderToCells(worksheet, 17, 24, 1, 14, 'thin');
     applyRowColorToCells(worksheet, 12, 1, 9);
     applyRowColorToCells(worksheet, 15, 1, 14);
     applyRowColorToCells(worksheet, 16, 1, 14);
-    applyRowBorderToCells(worksheet, 25, 1, 14, 'medium');
+    
 
     worksheet.getCell('A12').value = 'Katedra';
     worksheet.getCell('C12').value = 'Studij';
@@ -184,7 +175,7 @@ async function generateExcelTable() {
     worksheet.getCell('L16').value = 'sem';
     worksheet.getCell('M16').value = 'vjež';
     worksheet.getCell('N15').value = 'Ukupno za isplatu (EUR)';
-    worksheet.getCell('A25').value = 'UKUPNO';
+    
 
     worksheet.getRow(13).eachCell({ includeEmpty: true }, (cell) => {
       cell.font = {
@@ -194,7 +185,21 @@ async function generateExcelTable() {
       });
 
     const data = await readSecondTable();
-      
+    
+    worksheet.mergeCells(`A${data.length + 17}:C${data.length + 17}`);
+    worksheet.getCell(`A${data.length + 17}`).value = 'UKUPNO';
+    applyBorderToCells(worksheet, 17, data.length + 17, 1, 14, 'thin');
+    applyRowBorderToCells(worksheet, data.length + 17, 1, 14, 'medium');
+    worksheet.mergeCells(`A${data.length + 17 + 3}:C${data.length + 17 + 4}`);
+    worksheet.mergeCells(`J${data.length + 17 + 3}:L${data.length + 17 + 4}`);
+    worksheet.mergeCells(`A${data.length + 17 + 8}:C${data.length + 17 + 9}`);
+    worksheet.getCell(`A${data.length + 17 + 3}`).value = 'Prodekanica za nastavu i studentska pitanja\nProf. dr. sc.: Ime Prezime';
+    worksheet.getCell(`A${data.length + 17 + 8}`).value = 'Prodekan za financije i upravljanje\nProf. dr. sc. Ime Prezime';
+    worksheet.getCell(`J${data.length + 17 + 3}`).value = 'Dekan\nProf. dr. sc. Ime Prezime';
+    worksheet.getCell(`A${data.length + 17 + 3}`).alignment = { vertical: 'middle', wrapText: true };
+    worksheet.getCell(`A${data.length + 17 + 8}`).alignment = { vertical: 'middle', wrapText: true };
+    worksheet.getCell(`J${data.length + 17 + 8}`).alignment = { vertical: 'middle', wrapText: true };
+
     data.forEach((row, index) => {
       worksheet.getCell('A5').value = 'Predmet: ' + row['PredmetNaziv'];
       worksheet.getCell('A13').value = row['Katedra'];
@@ -210,23 +215,29 @@ async function generateExcelTable() {
       worksheet.getCell(`H${index + 17}`).value = row['NormaPlaniraniSatiPredavanja'];
       worksheet.getCell(`I${index + 17}`).value = row['NormaPlaniraniSatiSeminari'];
       worksheet.getCell(`J${index + 17}`).value = row['NormaPlaniraniSatiVjezbe'];
-      worksheet.getCell(`K${index + 17}`).value = row['RealiziraniSatiPredavanja'];
-      worksheet.getCell(`L${index + 17}`).value = row['RealiziraniSatiSeminari'];
-      worksheet.getCell(`M${index + 17}`).value = row['RealiziraniSatiVjezbe'];
-      worksheet.getCell(`N${index + 17}`).value = row['RealiziraniSatiPredavanja'] + row['RealiziraniSatiSeminari'] + row['RealiziraniSatiVjezbe'];
-      worksheet.getCell('E25').value = { formula: 'SUM(E17:E24)'};
-      worksheet.getCell('F25').value = { formula: 'SUM(F17:F24)'};
-      worksheet.getCell('G25').value = { formula: 'SUM(G17:G24)'};
-      worksheet.getCell('K25').value = { formula: 'SUM(E17:E24)'};
-      worksheet.getCell('L25').value = { formula: 'SUM(F17:F24)'};
-      worksheet.getCell('M25').value = { formula: 'SUM(G17:G24)'};
-      worksheet.getCell('N25').value = { formula: 'SUM(E17:E24)'};
-
-      setNumFormat(worksheet, 25, 25, 5, 7, '0.00');
-      setNumFormat(worksheet, 17, 25, 11, 14, '0.00');
-
+      // worksheet.getCell(`K${index + 17}`).value = row['RealiziraniSatiPredavanja'];
+      // worksheet.getCell(`L${index + 17}`).value = row['RealiziraniSatiSeminari'];
+      // worksheet.getCell(`M${index + 17}`).value = row['RealiziraniSatiVjezbe'];
+      // worksheet.getCell(`N${index + 17}`).value = row['RealiziraniSatiPredavanja'] + row['RealiziraniSatiSeminari'] + row['RealiziraniSatiVjezbe'];
+      
+      worksheet.getCell(`K${index + 17}`).value = { formula: `(E${index + 17}*H${index + 17})`};
+      worksheet.getCell(`L${index + 17}`).value = { formula: `(F${index + 17}*I${index + 17})`};
+      worksheet.getCell(`M${index + 17}`).value = { formula: `(G${index + 17}*J${index + 17})`};
+      worksheet.getCell(`N${index + 17}`).value = { formula: `SUM(K${index + 17}:M${index + 17})`};
     });
 
+    worksheet.getCell(`E${data.length + 17}`).value = { formula: `SUM(E17:E${data.length - 1 + 17})`};
+    worksheet.getCell(`F${data.length + 17}`).value = { formula: `SUM(F17:F${data.length - 1 + 17})`};
+    worksheet.getCell(`G${data.length + 17}`).value = { formula: `SUM(G17:G${data.length - 1 + 17})`};
+    worksheet.getCell(`K${data.length + 17}`).value = { formula: `SUM(K17:K${data.length - 1 + 17})`};
+    worksheet.getCell(`L${data.length + 17}`).value = { formula: `SUM(L17:L${data.length - 1 + 17})`};
+    worksheet.getCell(`M${data.length + 17}`).value = { formula: `SUM(M17:M${data.length - 1 + 17})`};
+    worksheet.getCell(`N${data.length + 17}`).value = { formula: `SUM(N17:N${data.length - 1 + 17})`};
+
+
+    setNumFormat(worksheet, data.length + 17, data.length + 17, 5, 7, '0.00');
+    setNumFormat(worksheet, 17, data.length + 17, 11, 14, '0.00');
+    
     await workbook.xlsx.writeFile('projectTwo.xlsx');
       console.log('Excel file generated!');
 }
